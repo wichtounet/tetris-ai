@@ -18,7 +18,7 @@ public class TetrisAI {
     /*
      * Time (ms) AI has to wait per keypress.
      */
-    public static final int waittime = 1;
+    public static final int waittime = 1; //1 does crash...
     // (for maximum speed without crashing, set waittime = 1, do_drop on)
 
     /*
@@ -246,9 +246,9 @@ public class TetrisAI {
             }
 
             if (block == 1) {
-                bl = ge.blockdef[ge.activeblock.type][r.rot];
+                bl = TetrisEngine.blockdef[ge.activeblock.type][r.rot];
             } else {
-                bl = ge.blockdef[ge.nextblock.type][r.rot];
+                bl = TetrisEngine.blockdef[ge.nextblock.type][r.rot];
             }
 
             // Now we find the fitting height by starting from the bottom and

@@ -206,7 +206,7 @@ public class TetrisEngine {
     /*
      * Maximum time allowed per step in milliseconds.
      */
-    public int steptime = 350;
+    public int steptime = 350; //Less than that is dangerous...
     /*
      * Time used to fade block that have been cleared.
      */

@@ -34,13 +34,13 @@ public class ProjectConstants {
      * Sleeps the current thread.
      */
     public static void sleep_(int n) {
-        try {
-            Thread.sleep(n);
-        } catch (Throwable t) {
-            // Might throw a ThreadDeath if we're sleeping while we terminate the thread
-            // but we're just going to ignore it.
+            try {
+                Thread.sleep(n);
+            } catch (Throwable t) {
+                // Might throw a ThreadDeath if we're sleeping while we terminate the thread
+                // but we're just going to ignore it.
+            }
         }
-    }
 
     /*
      * Returns a resource as an InputStream. First it tries to create a

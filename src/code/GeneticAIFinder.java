@@ -8,16 +8,19 @@ import java.util.*;
  * some values for the AI, then they call sendScore() to give us what they got.
  */
 public class GeneticAIFinder {
-
     // If false, just use the default values
     final boolean USE_GENETIC = false;
+    
     // Which generation are we in?
     int generation = 1;
+    
     // How many candidates are there in a generation?
     // Must be a multiple of 4.
     final int population = 16;
+    
     // How often do chromosomes mutate?
     double mutation_rate = 0.05;
+    
     // A chromosome is just an array of 7 doubles.
     double[][] chromosomes = new double[population][7];
     int[] scores = new int[population];
@@ -51,7 +54,7 @@ public class GeneticAIFinder {
                 + "; med = " + scores_[population / 2]
                 + "; max = " + scores_[population - 1]);
 
-        List<double[]> winners = new ArrayList<double[]>();
+        List<double[]> winners = new ArrayList<>();
 
         // Pair 1 with 2, 3 with 4, etc.
         for (int i = 0; i < (population / 2); i++) {
@@ -67,7 +70,7 @@ public class GeneticAIFinder {
 
 
         int counter = 0;
-        List<double[]> new_population = new ArrayList<double[]>();
+        List<double[]> new_population = new ArrayList<>();
 
         // Pair up two winners at a time
         for (int i = 0; i < (winners.size() / 2); i++) {
