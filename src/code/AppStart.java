@@ -12,24 +12,21 @@ public class AppStart {
     /*
      * Errors go to console if true, otherwise go to GUI logger.
      */
-
     public static final boolean REPORT_TO_CONSOLE = true;
 
     public static void main(String... args) {
         System.setErr(System.out);
 
         try {
-            UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Throwable t) {
         }
 
         //Better exception catching.
         Thread.setDefaultUncaughtExceptionHandler(
                 new Thread.UncaughtExceptionHandler() {
-
+                    @Override
                     public void uncaughtException(Thread t, Throwable e) {
-
                         if (REPORT_TO_CONSOLE) {
                             e.printStackTrace();
                         } else {
@@ -47,14 +44,12 @@ public class AppStart {
                 });
 
         SwingUtilities.invokeLater(new Runnable() {
-
+            @Override
             public void run() {
-                //Get the ball rolling!
-
                 new Thread(new Runnable() {
-
+                    @Override
                     public void run() {
-                        GameWindow win = new GameWindow();
+                        new GameWindow();
                     }
                 }).start();
             }

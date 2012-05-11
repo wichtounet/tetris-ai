@@ -249,7 +249,7 @@ public class TetrisEngine {
 
         //Initialize game thread.
         gamethread = new Thread() {
-
+            @Override
             public void run() {
                 while (true) {
 
@@ -318,7 +318,7 @@ public class TetrisEngine {
 
 
         //Less typing.
-        Block[][] nextb = null;
+        Block[][] nextb;
         if (nextblock != null) {
             nextb = nextblock.array;
             //Loop and draw next block.
@@ -525,7 +525,7 @@ public class TetrisEngine {
 
         //Return immediately.
         new Thread() {
-
+            @Override
             public void run() {
                 //pause the game first.
                 state = GameState.GAMEOVER;
@@ -654,9 +654,10 @@ public class TetrisEngine {
 
         Thread th = new Thread() {
 
+            @Override
             public void run() {
                 //Some copy/pasting here! =)
-                ArrayList<Block> fadeblocks = new ArrayList<Block>();
+                ArrayList<Block> fadeblocks = new ArrayList<>();
 
                 loop:
                 for (int i = blocks[0].length - 1; i >= 0; i--) {
@@ -816,7 +817,7 @@ public class TetrisEngine {
         blocksdropped += 1;
 
         if (!tetris.isHumanControlled
-                && System.currentTimeMillis() - lastnewblock > (100 + 50 * tetris.controller.waittime)) {
+                && System.currentTimeMillis() - lastnewblock > (100 + 50 * TetrisAI.waittime)) {
             System.out.println("Anomaly detected, retrying...");
             anomaly_flag = true;
             gameover();
