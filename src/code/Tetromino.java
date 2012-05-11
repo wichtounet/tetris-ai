@@ -7,12 +7,6 @@ import java.awt.Color;
  */
 public class Tetromino implements Cloneable {
     /*
-     * Constructor.
-     */
-
-    public Tetromino() {
-    }
-    /*
      * Contents (Block array)
      */
     public Block[][] array;
@@ -28,6 +22,7 @@ public class Tetromino implements Cloneable {
     /*
      * Copy.
      */
+    @Override
     public Tetromino clone() {
         Tetromino ret = new Tetromino();
         ret.array = array.clone();
@@ -42,6 +37,7 @@ public class Tetromino implements Cloneable {
     /*
      * String representation.
      */
+    @Override
     public String toString() {
         switch (type) {
             case 0:

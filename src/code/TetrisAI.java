@@ -18,12 +18,14 @@ public class TetrisAI {
     /*
      * Time (ms) AI has to wait per keypress.
      */
-    public static final int waittime = 20;
+    public static final int waittime = 1;
     // (for maximum speed without crashing, set waittime = 1, do_drop on)
-	/*
+
+    /*
      * Do we use hard drops?
      */
-    public static final boolean do_drop = false;
+    public static final boolean do_drop = true;
+    
     // Constants (sort of) for score evaluation.
     double _TOUCHING_EDGES = 3.97;
     double _TOUCHING_WALLS = 6.52;
@@ -48,11 +50,9 @@ public class TetrisAI {
     }
 
     class AIThread extends Thread {
-
+        @Override
         public void run() {
-
             while (flag) {
-
                 try {
                     //If it's merely paused, do nothing; if it's actually game over
                     //then break loop entirely.
@@ -145,12 +145,11 @@ public class TetrisAI {
      * the blocks are in.
      */
     BlockPosition computeBestFit(TetrisEngine ge) {
-
         byte[][][] allrotations = TetrisEngine.blockdef[ge.activeblock.type];
         int nrots = allrotations.length;
 
         // List of all the possible fits.
-        List<BlockPosition> posfits = new ArrayList<BlockPosition>();
+        List<BlockPosition> posfits = new ArrayList<>();
 
         // Loop through the rotations.
         // Here we generate all of the unique valid fits, and evaluate
@@ -174,7 +173,7 @@ public class TetrisAI {
         // Do everything again for the next block
         byte[][][] allrotations2 = TetrisEngine.blockdef[ge.nextblock.type];
         int nrots2 = allrotations2.length;
-        List<BlockPosition> posfits2 = new ArrayList<BlockPosition>();
+        List<BlockPosition> posfits2 = new ArrayList<>();
         for (int i = 0; i < nrots2; i++) {
             byte[][] trotation = allrotations2[i];
             int free = freeSpaces(trotation);
@@ -399,7 +398,6 @@ public class TetrisAI {
 
         //Penalize holes. Also penalize blocks above holes.
         for (int i = 0; i < ge.width; i++) {
-
             // Part 1: Count how many holes (space beneath blocks)
             boolean f = false;
             int holes = 0;
@@ -486,6 +484,5 @@ public class TetrisAI {
 
 // No tuple support in java.
 class BlockPosition {
-
     int bx, rot;
 }
