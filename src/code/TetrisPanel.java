@@ -26,10 +26,6 @@ public class TetrisPanel extends JPanel {
      */
     public TetrisEngine engine;
     /*
-     * Reference to the static SoundManager object.
-     */
-    public SoundManager sound;
-    /*
      * Background image used for the game.
      */
     public Image bg = null;
@@ -56,8 +52,6 @@ public class TetrisPanel extends JPanel {
     public TetrisPanel() {
         //Initialize the TetrisEngine object.
         engine = new TetrisEngine(this);
-
-        sound = SoundManager.getSoundManager();
 
         //This is the bg-image.
         try {
@@ -151,8 +145,6 @@ public class TetrisPanel extends JPanel {
 
         setFocusable(true);
         engine.state = GameState.PAUSED;
-
-        sound.music(SoundManager.Sounds.TETRIS_THEME);
 
         if (!isHumanControlled) {
             controller = new TetrisAI(this);

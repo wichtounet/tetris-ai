@@ -3,7 +3,6 @@ package code;
 import code.ProjectConstants.GameState;
 import static code.ProjectConstants.addLeadingZeroes;
 import static code.ProjectConstants.sleep_;
-import code.SoundManager.Sounds;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -424,9 +423,7 @@ public class TetrisEngine {
             activeblock.rot++;
         }
 
-        activeblock.array = toBlock2D(
-                blockdef[activeblock.type][activeblock.rot]);
-        tetris.sound.sfx(Sounds.ROTATE);
+        activeblock.array = toBlock2D(blockdef[activeblock.type][activeblock.rot]);
 
         //Failsafe revert.
         if (!copy()) {
@@ -506,7 +503,6 @@ public class TetrisEngine {
      * blocks to filled.
      */
     private synchronized void donecurrent() {
-        tetris.sound.sfx(Sounds.FALL);
         for (int i = 0; i < blocks.length; i++) {
             for (int r = 0; r < blocks[i].length; r++) {
                 if (blocks[i][r].getState() == Block.ACTIVE) {
@@ -536,9 +532,6 @@ public class TetrisEngine {
                 if (!tetris.isHumanControlled) {
                     tetris.controller.flag = false;
                 }
-
-                //die sound.
-                tetris.sound.sfx(Sounds.DIE);
 
                 if (!tetris.isHumanControlled) {
                     lastlines = lines;
@@ -688,7 +681,7 @@ public class TetrisEngine {
                 //Fade loop: works by object referencing
                 while (System.currentTimeMillis() - before
                         < fadetime) {
-                    if (fadeblocks.size() == 0) {
+                    if (fadeblocks.isEmpty()) {
                         break;//Lol yea.
                     }
                     //This is a linear fade algorithm.
@@ -786,13 +779,6 @@ public class TetrisEngine {
                 case 4:
                     score += 1200;
                     break;
-            }
-
-            //No new lines were cleared.
-            if (alreadycleared >= 4) {
-                tetris.sound.sfx(Sounds.TETRIS);
-            } else {
-                tetris.sound.sfx(Sounds.CLEAR);
             }
 
             lines += alreadycleared;
