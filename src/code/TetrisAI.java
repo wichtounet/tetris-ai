@@ -1,6 +1,5 @@
 package code;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -20,57 +19,11 @@ public class TetrisAI extends AbstractAI {
     public TetrisAI(TetrisPanel panel) {
         super(panel);
     }
-
-    // =============== Here be the AbstractAI code. ===============
-    /*
-     * This can calculate the best possible fit for it, given the current state
-     * the blocks are in.
-     */
+    
     @Override
-    protected BlockPosition computeBestFit(TetrisEngine ge) {
-        byte[][][] allrotations = TetrisEngine.blockdef[ge.activeblock.type];
-        int nrots = allrotations.length;
-
-        // List of all the possible fits.
-        List<BlockPosition> posfits = new ArrayList<BlockPosition>();
-
-        // Loop through the rotations.
-        // Here we generate all of the unique valid fits, and evaluate
-        // them later.
-        for (int i = 0; i < nrots; i++) {
-            byte[][] trotation = allrotations[i];
-            int free = freeSpaces(trotation);
-            int freeL = free / 10;
-            int freeR = free % 10;
-            int minX = 0 - freeL;
-            int maxX = (ge.width - 4) + freeR;
-            // now loop through each position for a rotation.
-            for (int j = minX; j <= maxX; j++) {
-                BlockPosition put = new BlockPosition();
-                put.bx = j;
-                put.rot = i;
-                posfits.add(put);
-            }
-        }
-
-        // Do everything again for the next block
-        byte[][][] allrotations2 = TetrisEngine.blockdef[ge.nextblock.type];
-        int nrots2 = allrotations2.length;
-        List<BlockPosition> posfits2 = new ArrayList<BlockPosition>();
-        for (int i = 0; i < nrots2; i++) {
-            byte[][] trotation = allrotations2[i];
-            int free = freeSpaces(trotation);
-            int freeL = free / 10;
-            int freeR = free % 10;
-            int minX = 0 - freeL;
-            int maxX = (ge.width - 4) + freeR;
-            for (int j = minX; j <= maxX; j++) {
-                BlockPosition put = new BlockPosition();
-                put.bx = j;
-                put.rot = i;
-                posfits2.add(put);
-            }
-        }
+    protected BlockPosition computeBestFit(TetrisEngine ge) {        
+        List<BlockPosition> posfits = getPossibleFits(ge, ge.activeblock.type);
+        List<BlockPosition> posfits2 = getPossibleFits(ge, ge.nextblock.type);
 
         // now we begin the evaluation.
         // for each element in the list we have, calculate a score, and pick
@@ -320,47 +273,5 @@ public class TetrisAI extends AbstractAI {
         //System.exit(0);
 
         return score;
-    }
-
-    // Takes a int array and calculates how many blocks of free spaces are there
-    // on the left and right. The return value is a 2 digit integer.
-    static int freeSpaces(byte[][] in) {
-
-        // It's free if all of them are zero, and their sum is zero.
-        boolean c1free = in[0][0] + in[1][0] + in[2][0] + in[3][0] == 0;
-        boolean c2free = in[0][1] + in[1][1] + in[2][1] + in[3][1] == 0;
-        boolean c3free = in[0][2] + in[1][2] + in[2][2] + in[3][2] == 0;
-        boolean c4free = in[0][3] + in[1][3] + in[2][3] + in[3][3] == 0;
-
-        int lfree = 0;
-        // Meh, I'm too lazy to code a loop for this.
-        if (c1free) {
-            lfree++;
-            if (c2free) {
-                lfree++;
-                if (c3free) {
-                    lfree++;
-                    if (c4free) {
-                        lfree++;
-                    }
-                }
-            }
-        }
-
-        int rfree = 0;
-        if (c4free) {
-            rfree++;
-            if (c3free) {
-                rfree++;
-                if (c2free) {
-                    rfree++;
-                    if (c1free) {
-                        rfree++;
-                    }
-                }
-            }
-        }
-
-        return lfree * 10 + rfree;
     }
 }
