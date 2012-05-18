@@ -6,6 +6,8 @@ public abstract class AbstractAI {
     protected TetrisPanel panel;
     protected TetrisEngine engine;
     
+    AIThread thread;
+    
     volatile boolean flag = false;
     
     /*
@@ -13,6 +15,54 @@ public abstract class AbstractAI {
      * (for maximum speed without crashing, set waittime = 1, do_drop on)
      */
     public static final int waittime = 1; //1 does crash...
+    
+    public AbstractAI(TetrisPanel panel) {
+        this.panel = panel;
+        
+        engine = panel.engine;
+        thread = new AIThread();
+    }
+
+    public void send_ready() {
+        if (!flag) {
+            thread.start();
+            flag = true;
+            engine.lastnewblock = System.currentTimeMillis();
+        }
+    }
+    
+    protected abstract BlockPosition computeBestFit(TetrisEngine engine);
+    
+    class AIThread extends Thread {
+        @Override
+        public void run() {
+            while (flag) {
+                try {
+                    //If it's merely paused, do nothing; if it's actually game over
+                    //then break loop entirely.
+                    if (engine.state == ProjectConstants.GameState.PLAYING) {
+                        if (engine.activeblock == null) {
+                            continue;
+                        }
+
+                        BlockPosition temp = computeBestFit(engine);
+                        if (engine.state == ProjectConstants.GameState.PLAYING) {
+                            int elx = temp.bx;
+                            int erot = temp.rot;
+
+                            //Move it!
+                            movehere(elx, erot);
+                        }
+                    }
+                    //safety
+                    sleep_(waittime);
+                } catch (Exception e) {
+                    //System.out.print("Aborting and retrying...\n");
+                    //return;
+                }
+            }
+        }
+    }
 
     protected void movehere(int finx, int finrot) {
         int st_blocksdropped = engine.blocksdropped;

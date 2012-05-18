@@ -10,7 +10,6 @@ import java.util.List;
  * engines so it can send key events when necessary and it knows the current block
  */
 public class TetrisAI extends AbstractAI {
-    AIThread thread;
 
     /*
      * Do we use hard drops?
@@ -27,48 +26,7 @@ public class TetrisAI extends AbstractAI {
     double _CLEAR = 1.6;
 
     public TetrisAI(TetrisPanel panel) {
-        this.panel = panel;
-        engine = panel.engine;
-        thread = new AIThread();
-    }
-
-    public void send_ready() {
-        if (!flag) {
-            thread.start();
-            flag = true;
-            engine.lastnewblock = System.currentTimeMillis();
-        }
-    }
-
-    class AIThread extends Thread {
-        @Override
-        public void run() {
-            while (flag) {
-                try {
-                    //If it's merely paused, do nothing; if it's actually game over
-                    //then break loop entirely.
-                    if (engine.state == GameState.PLAYING) {
-                        if (engine.activeblock == null) {
-                            continue;
-                        }
-
-                        BlockPosition temp = computeBestFit(engine);
-                        if (engine.state == GameState.PLAYING) {
-                            int elx = temp.bx;
-                            int erot = temp.rot;
-
-                            //Move it!
-                            movehere(elx, erot);
-                        }
-                    }
-                    //safety
-                    sleep_(waittime);
-                } catch (Exception e) {
-                    //System.out.print("Aborting and retrying...\n");
-                    //return;
-                }
-            }
-        }
+        super(panel);
     }
 
     // =============== Here be the AbstractAI code. ===============
@@ -76,7 +34,8 @@ public class TetrisAI extends AbstractAI {
      * This can calculate the best possible fit for it, given the current state
      * the blocks are in.
      */
-    BlockPosition computeBestFit(TetrisEngine ge) {
+    @Override
+    protected BlockPosition computeBestFit(TetrisEngine ge) {
         byte[][][] allrotations = TetrisEngine.blockdef[ge.activeblock.type];
         int nrots = allrotations.length;
 
