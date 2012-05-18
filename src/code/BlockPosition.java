@@ -1,5 +1,8 @@
 package code;
 
 public class BlockPosition {
-    int bx, rot;
+    int bx;
+    int rot;
+    
+    //TODO Hash
 }
