@@ -6,22 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * This the reinforcement learning AI. 
+ * This the reinforcement learning AbstractAI. 
  * 
- * TODO: Nothing is done so far, only a copy of the Tetris AI
+ * TODO: Nothing is done so far, only a copy of the Tetris AbstractAI
  */
-public class ReinforcementAI {
-
-    private TetrisPanel panel;
-    private TetrisEngine engine;
+public class ReinforcementAI extends AbstractAI {
     AIThread thread;
-    volatile boolean flag = false;
-    /*
-     * Time (ms) AI has to wait per keypress.
-     */
-    public static final int waittime = 1; //1 does crash...
-    // (for maximum speed without crashing, set waittime = 1, do_drop on)
-
+    
     /*
      * Do we use hard drops?
      */
@@ -64,7 +55,6 @@ public class ReinforcementAI {
 
                         BlockPosition temp = computeBestFit(engine);
                         if (engine.state == GameState.PLAYING) {
-
                             int elx = temp.bx;
                             int erot = temp.rot;
 
@@ -72,6 +62,7 @@ public class ReinforcementAI {
                             movehere(elx, erot);
                         }
                     }
+                    
                     //safety
                     sleep_(waittime);
                 } catch (Exception e) {
@@ -79,68 +70,10 @@ public class ReinforcementAI {
                     //return;
                 }
             }
-
-        }
-
-        /*
-         * Keypresses to move block to calculated position.
-         */
-        private void movehere(int finx, int finrot) {
-            int st_blocksdropped = engine.blocksdropped;
-
-            // we're going to make another failsafe here: if at any time we rotate it
-            // or move it and it doesn't move then it's stuck and we give up.
-
-            int init_state = engine.activeblock.rot;
-            int prev_state = init_state;
-            while (flag && engine.activeblock.rot != finrot) {
-                //Rotate first so we don't get stuck in the edges.
-                engine.keyrotate();
-
-                //Now wait.
-                sleep_(waittime);
-
-                if (prev_state == engine.activeblock.rot || init_state == engine.activeblock.rot) {
-                    engine.keyslam();
-                    sleep_(waittime > 3 ? waittime : 3);
-                }
-                prev_state = engine.activeblock.rot;
-            }
-
-            prev_state = engine.activeblock.x;
-            while (flag && engine.activeblock.x != finx) {
-                //Now nudge the block.
-                if (engine.activeblock.x < finx) {
-                    engine.keyright();
-                } else if (engine.activeblock.x > finx) {
-                    engine.keyleft();
-                }
-
-                sleep_(waittime);
-
-                if (prev_state == engine.activeblock.x) {
-                    engine.keyslam();
-                    sleep_(waittime > 3 ? waittime : 3);
-                }
-                prev_state = engine.activeblock.x;
-            }
-
-            if (flag && do_drop) {
-                engine.keyslam();
-                // make the minimum 3 to fix a weird threading glitch
-                sleep_(waittime > 3 ? waittime : 3);
-                return;
-            }
-
-            while (flag && engine.blocksdropped == st_blocksdropped) {
-                //Now move it down until it drops a new block.
-                engine.keydown();
-                sleep_(waittime);
-            }
         }
     }
 
-    // =============== Here be the AI code. ===============
+    // =============== Here be the AbstractAI code. ===============
     /*
      * This can calculate the best possible fit for it, given the current state
      * the blocks are in.
