@@ -54,7 +54,7 @@ public class GeneticAIFinder {
                 + "; med = " + scores_[population / 2]
                 + "; max = " + scores_[population - 1]);
 
-        List<double[]> winners = new ArrayList<>();
+        List<double[]> winners = new ArrayList<double[]>();
 
         // Pair 1 with 2, 3 with 4, etc.
         for (int i = 0; i < (population / 2); i++) {
@@ -70,7 +70,7 @@ public class GeneticAIFinder {
 
 
         int counter = 0;
-        List<double[]> new_population = new ArrayList<>();
+        List<double[]> new_population = new ArrayList<double[]>();
 
         // Pair up two winners at a time
         for (int i = 0; i < (winners.size() / 2); i++) {

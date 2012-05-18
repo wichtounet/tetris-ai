@@ -657,7 +657,7 @@ public class TetrisEngine {
             @Override
             public void run() {
                 //Some copy/pasting here! =)
-                ArrayList<Block> fadeblocks = new ArrayList<>();
+                ArrayList<Block> fadeblocks = new ArrayList<Block>();
 
                 loop:
                 for (int i = blocks[0].length - 1; i >= 0; i--) {

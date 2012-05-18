@@ -149,7 +149,7 @@ public class TetrisAI {
         int nrots = allrotations.length;
 
         // List of all the possible fits.
-        List<BlockPosition> posfits = new ArrayList<>();
+        List<BlockPosition> posfits = new ArrayList<BlockPosition>();
 
         // Loop through the rotations.
         // Here we generate all of the unique valid fits, and evaluate
@@ -173,7 +173,7 @@ public class TetrisAI {
         // Do everything again for the next block
         byte[][][] allrotations2 = TetrisEngine.blockdef[ge.nextblock.type];
         int nrots2 = allrotations2.length;
-        List<BlockPosition> posfits2 = new ArrayList<>();
+        List<BlockPosition> posfits2 = new ArrayList<BlockPosition>();
         for (int i = 0; i < nrots2; i++) {
             byte[][] trotation = allrotations2[i];
             int free = freeSpaces(trotation);
