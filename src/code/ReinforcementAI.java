@@ -13,6 +13,7 @@ public class ReinforcementAI extends AbstractAI {
     //The action should be a BlockPosition object
     
     private static int iteration = -1;
+    private static int totalScores = 0;
     
     //Warning: The object is constructed for every game, data should be stored static
     
@@ -28,7 +29,11 @@ public class ReinforcementAI extends AbstractAI {
     @Override
     public void send_ready(int score) {
         if(iteration > -1){
+            totalScores += score;
+            
             System.out.println("Generation: " + iteration + " scored " + score);
+            
+            System.out.println("Mean: " + (totalScores / (iteration + 1)));
         }
         
         //Pass to the next iteration
