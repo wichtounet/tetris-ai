@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * This is the default tetris playing AI. It holds a reference to the tetris
- * engines so it can send key events when necessary and it knows the current block
+ * This the reinforcement learning AI. 
+ * 
+ * TODO: Nothing is done so far, only a copy of the Tetris AI
  */
-public class TetrisAI {
+public class ReinforcementAI {
 
     private TetrisPanel panel;
     private TetrisEngine engine;
@@ -35,7 +36,7 @@ public class TetrisAI {
     double _BLOCKADE = -0.59;
     double _CLEAR = 1.6;
 
-    public TetrisAI(TetrisPanel panel) {
+    public ReinforcementAI(TetrisPanel panel) {
         this.panel = panel;
         engine = panel.engine;
         thread = new AIThread();
