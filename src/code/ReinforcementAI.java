@@ -12,8 +12,19 @@ public class ReinforcementAI extends AbstractAI {
     //TODO Store the action for each possible state
     //The action should be a BlockPosition object
     
+    private static int iteration = 0;
+    
+    //Warning: The object is constructed for every game, data should be stored static
+    
     public ReinforcementAI(TetrisPanel panel) {
         super(panel);
+    }
+
+    @Override
+    public void send_ready() {
+        super.send_ready();
+        
+        System.out.println("Generation: " + iteration++);
     }
     
     @Override

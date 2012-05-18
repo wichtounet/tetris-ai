@@ -544,11 +544,17 @@ public class TetrisEngine {
                 sleep_(100);
 
                 if (!tetris.isHumanControlled) {
-                    if (!anomaly_flag) {
+                    if (!anomaly_flag && ProjectConstants.BASIC_AI) {
                         tetris.genetic.sendScore(lastscore);
                     }
-                    tetris.controller = new TetrisAI(tetris);
-                    tetris.genetic.setAIValues(tetris.controller);
+                    
+                    if(ProjectConstants.BASIC_AI){
+                        tetris.controller = new TetrisAI(tetris);
+                        tetris.genetic.setAIValues((TetrisAI) tetris.controller);
+                    } else {
+                        tetris.controller = new ReinforcementAI(tetris);
+                    }
+                    
                     state = GameState.PLAYING;
                     tetris.controller.send_ready();
                     anomaly_flag = false;
@@ -557,7 +563,6 @@ public class TetrisEngine {
 
             }
         }.start();
-
     }
 
     /*
@@ -817,7 +822,7 @@ public class TetrisEngine {
         blocksdropped += 1;
 
         if (!tetris.isHumanControlled
-                && System.currentTimeMillis() - lastnewblock > (100 + 50 * TetrisAI.waittime)) {
+                && System.currentTimeMillis() - lastnewblock > (100 + 50 * AbstractAI.waittime)) {
             System.out.println("Anomaly detected, retrying...");
             anomaly_flag = true;
             gameover();

@@ -10,11 +10,12 @@ import java.net.URL;
  * This class contains a group of project constants. Use import static tetris.code.ProjectConstants.
  */
 public class ProjectConstants {
-
     /*
      * Should the application start fullscreened?
      */
     public static final boolean STARTFS = false;
+    
+    public static final boolean BASIC_AI = false;
 
     /*
      * Yes this adds leading zeroes.

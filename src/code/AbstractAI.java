@@ -81,10 +81,10 @@ public abstract class AbstractAI {
             //Rotate first so we don't get stuck in the edges.
             engine.keyrotate();
             //Now wait.
-            sleep_(TetrisAI.waittime);
+            sleep_(waittime);
             if (prev_state == engine.activeblock.rot || init_state == engine.activeblock.rot) {
                 engine.keyslam();
-                sleep_(TetrisAI.waittime > 3 ? TetrisAI.waittime : 3);
+                sleep_(waittime > 3 ? waittime : 3);
             }
             prev_state = engine.activeblock.rot;
         }
@@ -96,23 +96,23 @@ public abstract class AbstractAI {
             } else if (engine.activeblock.x > finx) {
                 engine.keyleft();
             }
-            sleep_(TetrisAI.waittime);
+            sleep_(waittime);
             if (prev_state == engine.activeblock.x) {
                 engine.keyslam();
-                sleep_(TetrisAI.waittime > 3 ? TetrisAI.waittime : 3);
+                sleep_(waittime > 3 ? waittime : 3);
             }
             prev_state = engine.activeblock.x;
         }
-        if (flag && TetrisAI.do_drop) {
+        if (flag && do_drop) {
             engine.keyslam();
             // make the minimum 3 to fix a weird threading glitch
-            sleep_(TetrisAI.waittime > 3 ? TetrisAI.waittime : 3);
+            sleep_(waittime > 3 ? waittime : 3);
             return;
         }
         while (flag && engine.blocksdropped == st_blocksdropped) {
             //Now move it down until it drops a new block.
             engine.keydown();
-            sleep_(TetrisAI.waittime);
+            sleep_(waittime);
         }
     }
 

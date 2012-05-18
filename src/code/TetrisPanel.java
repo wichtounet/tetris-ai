@@ -40,7 +40,7 @@ public class TetrisPanel extends JPanel {
     /*
      * AI object controlling the game.
      */
-    public TetrisAI controller = null;
+    public AbstractAI controller = null;
     /*
      * Genetic algorithm to find AI combinations
      */
@@ -147,9 +147,13 @@ public class TetrisPanel extends JPanel {
         engine.state = GameState.PAUSED;
 
         if (!isHumanControlled) {
-            controller = new TetrisAI(this);
-            genetic = new GeneticAIFinder(engine);
-            genetic.setAIValues(controller);
+            if(ProjectConstants.BASIC_AI){
+                controller = new TetrisAI(this);
+                genetic = new GeneticAIFinder(engine);
+                genetic.setAIValues((TetrisAI) controller);
+            } else {
+                controller = new ReinforcementAI(this);
+            }
         }
     }
 
