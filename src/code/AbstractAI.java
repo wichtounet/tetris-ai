@@ -16,6 +16,11 @@ public abstract class AbstractAI {
      */
     public static final int waittime = 1; //1 does crash...
     
+    /*
+     * Do we use hard drops?
+     */
+    public static final boolean do_drop = true;
+    
     public AbstractAI(TetrisPanel panel) {
         this.panel = panel;
         

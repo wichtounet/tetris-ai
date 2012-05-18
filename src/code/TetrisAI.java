@@ -1,7 +1,5 @@
 package code;
 
-import code.ProjectConstants.GameState;
-import static code.ProjectConstants.sleep_;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,12 +8,6 @@ import java.util.List;
  * engines so it can send key events when necessary and it knows the current block
  */
 public class TetrisAI extends AbstractAI {
-
-    /*
-     * Do we use hard drops?
-     */
-    public static final boolean do_drop = true;
-    
     // Constants (sort of) for score evaluation.
     double _TOUCHING_EDGES = 3.97;
     double _TOUCHING_WALLS = 6.52;
