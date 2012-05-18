@@ -119,10 +119,10 @@ public class TetrisPanel extends JPanel {
             }
         });
         kpm.putKey(KeyEvent.VK_SHIFT, new Runnable() {
-
+            @Override
             public void run() {
                 if (engine.state != GameState.GAMEOVER && controller != null && !controller.thread.isAlive()) {
-                    controller.send_ready();
+                    controller.send_ready(engine.score);
                 }
                 if (engine.state == GameState.PAUSED) {
                     engine.state = GameState.PLAYING;

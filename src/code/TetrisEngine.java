@@ -556,7 +556,7 @@ public class TetrisEngine {
                     }
                     
                     state = GameState.PLAYING;
-                    tetris.controller.send_ready();
+                    tetris.controller.send_ready(lastscore);
                     anomaly_flag = false;
                     lastnewblock = System.currentTimeMillis();
                 }

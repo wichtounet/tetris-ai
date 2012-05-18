@@ -30,7 +30,7 @@ public abstract class AbstractAI {
         thread = new AIThread();
     }
 
-    public void send_ready() {
+    public void send_ready(int lastscore) {
         if (!flag) {
             thread.start();
             flag = true;
