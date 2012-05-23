@@ -8,7 +8,7 @@ public abstract class AbstractAI {
     protected TetrisPanel panel;
     protected TetrisEngine engine;
     
-    AIThread thread;
+    Thread thread;
     
     volatile boolean flag = false;
     
@@ -16,7 +16,7 @@ public abstract class AbstractAI {
      * Time (ms) AbstractAI has to wait per keypress.
      * (for maximum speed without crashing, set waittime = 1, do_drop on)
      */
-    public static final int waittime = 1; //1 does crash...
+    public static final int waittime = 20; //1 does crash...
     
     /*
      * Do we use hard drops?
@@ -27,9 +27,12 @@ public abstract class AbstractAI {
         this.panel = panel;
         
         engine = panel.engine;
-        thread = new AIThread();
     }
-
+    
+    public void setThread(Thread thread){
+        this.thread = thread;
+    }
+    
     public void send_ready(int lastscore) {
         if (!flag) {
             thread.start();
@@ -175,8 +178,8 @@ public abstract class AbstractAI {
             // now loop through each position for a rotation.
             for (int j = minX; j <= maxX; j++) {
                 BlockPosition put = new BlockPosition();
-                put.bx = j;
-                put.rot = i;
+                put.bx = (byte) j;
+                put.rot = (byte) i;
                 posfits.add(put);
             }
         }

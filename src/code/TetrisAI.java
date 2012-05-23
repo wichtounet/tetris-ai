@@ -18,6 +18,8 @@ public class TetrisAI extends AbstractAI {
 
     public TetrisAI(TetrisPanel panel) {
         super(panel);
+        
+        setThread(new AIThread());
     }
     
     @Override

@@ -171,7 +171,7 @@ public class TetrisEngine {
     /*
      * Width and height of the grid, counted in number of blocks.
      */
-    public int width = 10, height = (int) (1.8 * width);
+    public int width = 8, height = 16;
     /*
      * Dimensions (Width and height) of each square. Squares in Tetris must be
      * the same height and width.
@@ -251,14 +251,14 @@ public class TetrisEngine {
         gamethread = new Thread() {
             @Override
             public void run() {
-                while (true) {
+               while (true) {
 
                     long timeelapsedsincelaststep =
                             System.currentTimeMillis() - laststep;
 
                     //Took too much CPU.
                     sleep_(steptime / 2);
-
+                    
                     //Break loop if game isn't even playing.
                     //Best to put AFTER sleeping.
                     synchronized (TetrisEngine.this) {
@@ -495,7 +495,9 @@ public class TetrisEngine {
         score = 0;
         lines = 0;
         clear();
-        activeblock.array = null;
+        if(activeblock != null){
+            activeblock.array = null;
+        }
     }
 
     /*
@@ -631,7 +633,7 @@ public class TetrisEngine {
     /*
      * Steps into the next phase if possible.
      */
-    private synchronized void step() {
+    public synchronized void step() {
         if (activeblock == null) {//step() gives you a random block if none is available.
             newblock();
 
@@ -822,7 +824,7 @@ public class TetrisEngine {
         blocksdropped += 1;
 
         if (!tetris.isHumanControlled
-                && System.currentTimeMillis() - lastnewblock > (100 + 50 * AbstractAI.waittime)) {
+                && System.currentTimeMillis() - lastnewblock > (200 + 50 * AbstractAI.waittime)) {
             System.out.println("Anomaly detected, retrying...");
             anomaly_flag = true;
             gameover();
