@@ -16,7 +16,7 @@ public abstract class AbstractAI {
      * Time (ms) AbstractAI has to wait per keypress.
      * (for maximum speed without crashing, set waittime = 1, do_drop on)
      */
-    public static final int waittime = 20; //1 does crash...
+    public static final int waittime = 10; //1 does crash...
     
     /*
      * Do we use hard drops?

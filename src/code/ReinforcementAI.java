@@ -26,13 +26,14 @@ public class ReinforcementAI extends AbstractAI {
     //Discount factor
     private static final float lambda = 0.8f;
     
-    private static final int LEVELS = 2;
+    private static final int LEVELS = 3;//WARNING Memory usage is exponential to LEVELS
     
-    private static final float REWARD_LESS_LEVEL = 200;
-    private static final float REWARD_SAME_LEVEL = 50;
-    private static final float REWARD_MORE_LEVEL = -250;
+    private static final float REWARD_LESS_LEVEL = 250;
+    private static final float REWARD_SAME_LEVEL = 100;
+    private static final float REWARD_MORE_LEVEL = -200;
     
-    private static final float DEFAULT_VALUE = 0;
+    //By default, an unknown state has the same value as an action that doesn't change the max level of the game
+    private static final float DEFAULT_VALUE = REWARD_SAME_LEVEL;
     
     //Random number generator
     private static final Random random = new Random();
@@ -96,30 +97,35 @@ public class ReinforcementAI extends AbstractAI {
         return null;
     }
     
-    private void doAction(TetrisEngine ge) {        
+    private void doAction(TetrisEngine ge) {      
+        //Compute the current state
         State state = computeState(ge.blocks);
         
+        //Get the best known action for this state
         BlockPosition action = getAction(ge, state);
         
-        int topLevel = getTopLevel(ge.blocks);
+        //Warning: Top and Max level are not the same
+        int maxLevel = getMaxLevel(ge.blocks);
         
+        //Do the action
         movehere(action.bx, action.rot);
         
         float reward = 0;
         
         //Reward difference in level
-        int diffLevel = getTopLevel(ge.blocks) - topLevel;
-        if(diffLevel > 0){
-            reward += diffLevel * REWARD_LESS_LEVEL;
+        int diffLevel = getMaxLevel(ge.blocks) - maxLevel;
+        if(diffLevel < 0){
+            reward += -diffLevel * REWARD_LESS_LEVEL;
         } else if(diffLevel == 0){
             reward += REWARD_SAME_LEVEL;
         } else {
-            reward += -diffLevel * REWARD_MORE_LEVEL;
+            reward += diffLevel * REWARD_MORE_LEVEL;
         }
         
         //TODO HOLES
         //TODO EDGES
         
+        //Compute the new state
         State nextState = computeState(ge.blocks);
         BlockPosition nextAction = getAction(ge, nextState);
         
@@ -129,8 +135,6 @@ public class ReinforcementAI extends AbstractAI {
         
         //Update the Q(s, a)
         Q.put(sa, value(sa) + alpha * (reward + lambda * value(nsa) - value(sa)));
-        
-        //System.out.println(Q.get(sa));
     }
 
     private State computeState(Block[][] blocks) {
@@ -139,14 +143,12 @@ public class ReinforcementAI extends AbstractAI {
         State state  = new State();
         state.bs = new BitSet(LEVELS * blocks.length);
         
-        for(int i = 0; i + topLevel < LEVELS; ++i){
-            for(int j = 0; j < blocks[i+topLevel].length; ++j){
-                if(blocks[i+topLevel][j].getState() == 0){
-                    state.bs.clear(i * blocks.length + j);
-                } else {
-                    state.bs.set(i * blocks.length + j);
+        for(int column = 0; column < blocks.length; ++column){
+            for(int i = 0; i < LEVELS; ++i){
+                if(blocks[column][i + topLevel].getState() == Block.FILLED){
+                    state.bs.set(i * blocks.length + column);
                 }
-            }            
+            }
         }
         
         return state;
@@ -166,6 +168,22 @@ public class ReinforcementAI extends AbstractAI {
         }
         
         return Math.min(minLevel, blocks[0].length - 1 - (LEVELS - 1));
+    }
+
+    private int getMaxLevel(Block[][] blocks) {
+        int minLevel = Integer.MAX_VALUE;
+        
+        for(int i = 0; i < blocks.length; ++i){
+            for(int j = 0; j < blocks[i].length; ++j){
+                if(blocks[i][j].getState() == Block.FILLED){
+                    if(j < minLevel){
+                        minLevel = j;
+                    }
+                }
+            }
+        }
+        
+        return blocks[0].length - minLevel;
     }
 
     private BlockPosition getAction(TetrisEngine ge, State state) {
@@ -196,7 +214,8 @@ public class ReinforcementAI extends AbstractAI {
             }
             
             if(action == null){
-                System.out.println("Best action is null");
+                System.out.println("Best action is null, returning exploration");
+                action = posfits.get(random.nextInt(posfits.size()));
             }
         }
         
@@ -206,6 +225,10 @@ public class ReinforcementAI extends AbstractAI {
     private float value(StateAction sa){
         if(!Q.containsKey(sa)){
             Q.put(sa, DEFAULT_VALUE);
+            
+            if(Q.size() % 1000 == 0){
+                System.out.println("Grow to " + Q.size());
+            }
             
             return DEFAULT_VALUE;
         }

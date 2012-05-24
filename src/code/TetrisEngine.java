@@ -541,9 +541,9 @@ public class TetrisEngine {
 
                 int lastscore = score;
 
-                sleep_(1200);
+                sleep_(20);
                 reset();
-                sleep_(100);
+                sleep_(20);
 
                 if (!tetris.isHumanControlled) {
                     if (!anomaly_flag && ProjectConstants.BASIC_AI) {
