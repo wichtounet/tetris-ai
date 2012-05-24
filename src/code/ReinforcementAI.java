@@ -55,6 +55,7 @@ public class ReinforcementAI extends AbstractAI {
                     //then break loop entirely.
                     if (engine.state == ProjectConstants.GameState.PLAYING) {
                         if (engine.activeblock != null) {
+                            //System.out.println("doAction()");
                             doAction(engine);
                             //engine.step();
                         }
@@ -70,7 +71,7 @@ public class ReinforcementAI extends AbstractAI {
             }
         }
     }
-
+    
     @Override
     public void send_ready(int score) {
         if(iteration > -1){

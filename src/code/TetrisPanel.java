@@ -71,10 +71,10 @@ public class TetrisPanel extends JPanel {
 
         //Animation loop. Updates every 40 milliseconds (25 fps).
         new Thread() {
-
+            @Override
             public void run() {
                 while (true) {
-                    sleep_(40);
+                    sleep_(10);
                     repaint();
                 }
             }
@@ -83,37 +83,31 @@ public class TetrisPanel extends JPanel {
         //Add all these key functions.
         KeyPressManager kpm = new KeyPressManager();
         kpm.putKey(KeyEvent.VK_LEFT, new Runnable() {
-
             public void run() {
                 TetrisPanel.this.engine.keyleft();
             }
         });
         kpm.putKey(KeyEvent.VK_RIGHT, new Runnable() {
-
             public void run() {
                 TetrisPanel.this.engine.keyright();
             }
         });
         kpm.putKey(KeyEvent.VK_DOWN, new Runnable() {
-
             public void run() {
                 TetrisPanel.this.engine.keydown();
             }
         });
         kpm.putKey(KeyEvent.VK_SPACE, new Runnable() {
-
             public void run() {
                 TetrisPanel.this.engine.keyslam();
             }
         });
         kpm.putKey(KeyEvent.VK_UP, new Runnable() {
-
             public void run() {
                 TetrisPanel.this.engine.keyrotate();
             }
         });
         kpm.putKey(KeyEvent.VK_Z, new Runnable() {
-
             public void run() {
                 TetrisPanel.this.engine.keyrotate();
             }
@@ -179,11 +173,9 @@ public class TetrisPanel extends JPanel {
      * Note that some keys should never be counted more than once.
      */
     class KeyPressManager extends KeyAdapter {
-
         static final int delay = 40;
 
         class KeyHandlingThread extends Thread {
-
             volatile boolean flag = true;
 
             public void run() {

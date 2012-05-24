@@ -35,7 +35,11 @@ public abstract class AbstractAI {
     
     public void send_ready(int lastscore) {
         if (!flag) {
-            thread.start();
+            //TODO Check if correct
+            if(!thread.isAlive()){
+                thread.start();
+            }
+            
             flag = true;
             engine.lastnewblock = System.currentTimeMillis();
         }
@@ -88,8 +92,11 @@ public abstract class AbstractAI {
             if (prev_state == engine.activeblock.rot || init_state == engine.activeblock.rot) {
                 engine.keyslam();
                 sleep_(waittime > 3 ? waittime : 3);
+                return;
+            } else {
+                prev_state = engine.activeblock.rot;
+            
             }
-            prev_state = engine.activeblock.rot;
         }
         prev_state = engine.activeblock.x;
         while (flag && engine.activeblock.x != finx) {
@@ -103,8 +110,10 @@ public abstract class AbstractAI {
             if (prev_state == engine.activeblock.x) {
                 engine.keyslam();
                 sleep_(waittime > 3 ? waittime : 3);
+                return;
+            } else {
+                prev_state = engine.activeblock.x;
             }
-            prev_state = engine.activeblock.x;
         }
         if (flag && do_drop) {
             engine.keyslam();

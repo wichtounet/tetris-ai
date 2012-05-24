@@ -46,12 +46,7 @@ public class AppStart {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new GameWindow();
-                    }
-                }).start();
+                new GameWindow();
             }
         });
     }

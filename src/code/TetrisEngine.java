@@ -251,25 +251,8 @@ public class TetrisEngine {
         gamethread = new Thread() {
             @Override
             public void run() {
-               while (true) {
-
-                    long timeelapsedsincelaststep =
-                            System.currentTimeMillis() - laststep;
-
-                    //Took too much CPU.
-                    sleep_(steptime / 2);
-                    
-                    //Break loop if game isn't even playing.
-                    //Best to put AFTER sleeping.
-                    synchronized (TetrisEngine.this) {
-                        if (!(state == GameState.PLAYING)) {
-                            continue;
-                        }
-                        if (timeelapsedsincelaststep > steptime) {
-                            step();
-                        }
-                    }
-                }
+                //Only one step, the others are launched when key slammed
+                step();
             }
         };
     }
@@ -526,45 +509,43 @@ public class TetrisEngine {
         }
 
         //Return immediately.
-        new Thread() {
+        /*new Thread() {
             @Override
             public void run() {
-                //pause the game first.
+                //pause the game first.*/
                 state = GameState.GAMEOVER;
+                
                 if (!tetris.isHumanControlled) {
                     tetris.controller.flag = false;
-                }
-
-                if (!tetris.isHumanControlled) {
                     lastlines = lines;
                 }
 
                 int lastscore = score;
 
-                sleep_(20);
+                //sleep_(20);
                 reset();
-                sleep_(20);
+                //sleep_(20);
 
                 if (!tetris.isHumanControlled) {
-                    if (!anomaly_flag && ProjectConstants.BASIC_AI) {
+                    /*if (!anomaly_flag && ProjectConstants.BASIC_AI) {
                         tetris.genetic.sendScore(lastscore);
-                    }
+                    }*/
                     
                     if(ProjectConstants.BASIC_AI){
                         tetris.controller = new TetrisAI(tetris);
                         tetris.genetic.setAIValues((TetrisAI) tetris.controller);
                     } else {
-                        tetris.controller = new ReinforcementAI(tetris);
+                        //tetris.controller = new ReinforcementAI(tetris);
                     }
                     
                     state = GameState.PLAYING;
-                    tetris.controller.send_ready(lastscore);
                     anomaly_flag = false;
                     lastnewblock = System.currentTimeMillis();
+                    tetris.controller.send_ready(lastscore);
                 }
 
-            }
-        }.start();
+            /*}
+        }.start();*/
     }
 
     /*
@@ -621,6 +602,7 @@ public class TetrisEngine {
             blocks = copy2D(buffer);
 
         } catch (ArrayIndexOutOfBoundsException e) {
+            //Not a problem
             return false;
         }//Noob bounds detection.
         //Exceptions are supposedly slow but
@@ -658,80 +640,12 @@ public class TetrisEngine {
     private synchronized void checkforclears() {
         //Threading fix?
         activeblock = null;
+        
+        //Don't care about fading
 
-        Thread th = new Thread() {
-
-            @Override
-            public void run() {
-                //Some copy/pasting here! =)
-                ArrayList<Block> fadeblocks = new ArrayList<Block>();
-
-                loop:
-                for (int i = blocks[0].length - 1; i >= 0; i--) {
-                    //check for unfilled blocks.
-                    for (int y = 0; y < blocks.length; y++) {
-                        if (!(blocks[y][i].getState() == Block.FILLED)) {
-                            continue loop;
-                        }
-                    }
-
-                    //passed; now add blocks.
-                    for (int u = 0; u < blocks.length; u++) {
-                        fadeblocks.add(blocks[u][i]);
-                    }
-                }
-
-                long before = System.currentTimeMillis();
-                int approxloops = fadetime / 20;
-
-                state = GameState.BUSY;
-
-                //Fade loop: works by object referencing
-                while (System.currentTimeMillis() - before
-                        < fadetime) {
-                    if (fadeblocks.isEmpty()) {
-                        break;//Lol yea.
-                    }
-                    //This is a linear fade algorithm.
-                    for (Block b : fadeblocks) {
-                        //Not the best color algorithm, but works most of
-                        //the time.
-
-                        //New fading algorithm. Only changes the ALPHA value
-                        //and leaves the rgb.
-                        Color bcol = b.getColor();
-                        int R = bcol.getRed();
-                        int G = bcol.getGreen();
-                        int B = bcol.getBlue();
-                        int AL = bcol.getAlpha();
-
-                        int fade = (AL - Block.emptycolor.getAlpha()) / approxloops;
-
-                        if (AL > 0) {
-                            AL -= fade;
-                        }
-
-                        if (AL < 0) //Occasionally crashes without this.
-                        {
-                            AL = 0;
-                        }
-
-                        Color newc = new Color(R, G, B, AL);
-                        b.setColor(newc);
-                    }
-
-                    sleep_(20);
-                }
-
-                state = GameState.PLAYING;
-
-                //Now actually remove the blocks.
-                checkforclears(0, null);
-                newblock();
-            }
-        };
-
-        th.start();
+        //Now actually remove the blocks.
+        checkforclears(0, null);
+        newblock();
     }
 
     /*
@@ -871,13 +785,14 @@ public class TetrisEngine {
      */
     static Block[][] copy2D(Block[][] in) {
         //if(in == null) return null;
-        Block[][] ret;
-        ret = new Block[in.length][in[0].length];
+        Block[][] ret = new Block[in.length][in[0].length];
+        
         for (int i = 0; i < in.length; i++) {
             for (int j = 0; j < in[0].length; j++) {
                 ret[i][j] = in[i][j].clone();
             }
         }
+        
         return ret;
     }
 
