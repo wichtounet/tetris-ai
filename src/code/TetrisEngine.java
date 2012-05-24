@@ -644,7 +644,7 @@ public class TetrisEngine {
         //Don't care about fading
 
         //Now actually remove the blocks.
-        checkforclears(0, null);
+        checkforclears(0);
         newblock();
     }
 
@@ -652,19 +652,16 @@ public class TetrisEngine {
      * As expected this function checks whether there are any clears. Uses
      * recursion if more than one line can be cleared. Don't run this on the EDT!
      */
-    private synchronized void checkforclears(int alreadycleared, Block[][] b) {
-        if (b == null) {
-            b = blocks;
-        }
+    private synchronized void checkforclears(int alreadycleared) {
         int whichline = -1;
         int old = alreadycleared;
 
         //Loops to find any row that has every block filled.
         // If one block is not filled, the loop breaks.
         ML:
-        for (int i = b[0].length - 1; i >= 0; i--) {
-            for (int y = 0; y < b.length; y++) {
-                if (!(b[y][i].getState() == Block.FILLED)) {
+        for (int i = blocks[0].length - 1; i >= 0; i--) {
+            for (int y = 0; y < blocks.length; y++) {
+                if (!(blocks[y][i].getState() == Block.FILLED)) {
                     continue ML;
                 }
             }
@@ -678,14 +675,17 @@ public class TetrisEngine {
         if (alreadycleared > old) {
             for (int i = whichline; i > 0; i--) {//Iterate and copy the state of the block on top of itself
                 //to its location.
-                for (int y = 0; y < b.length; y++) {
-                    b[y][i] = b[y][i - 1];
+                for (int y = 0; y < blocks.length; y++) {
+                    blocks[y][i] = blocks[y][i - 1];
                 }
             }
 
+            //TODO Find a better way to fix StackOverflowError
+            if(alreadycleared < 5){
             //Recursion step! Necessary if you want to clear more than
             //1 line at a time!
-            checkforclears(alreadycleared, b);
+            checkforclears(alreadycleared);
+            }
         } else if (alreadycleared > 0) {
             // Use Nintendo's original scoring system.
             switch (alreadycleared) {
@@ -705,8 +705,6 @@ public class TetrisEngine {
 
             lines += alreadycleared;
         }
-
-        blocks = b;
     }
 
     /*

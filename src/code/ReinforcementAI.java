@@ -18,7 +18,7 @@ public class ReinforcementAI extends AbstractAI {
     private static int maxScore = -1;
     
     //Percentage of time where the agent explores another way
-    private static final int epsilon = 5;
+    private static final int epsilon = 7;
     
     //Learning rate
     private static final float alpha = 0.8f;
@@ -28,9 +28,9 @@ public class ReinforcementAI extends AbstractAI {
     
     private static final int LEVELS = 3;//WARNING Memory usage is exponential to LEVELS
     
-    private static final float REWARD_LESS_LEVEL = 250;
-    private static final float REWARD_SAME_LEVEL = 100;
-    private static final float REWARD_MORE_LEVEL = -200;
+    private static final float REWARD_LESS_LEVEL = 2.5f;
+    private static final float REWARD_SAME_LEVEL = 1.0f;
+    private static final float REWARD_MORE_LEVEL = -4.0f;
     
     //By default, the value of unknown state is the max reward
     private static final float DEFAULT_VALUE = 4 * REWARD_LESS_LEVEL;
@@ -196,27 +196,18 @@ public class ReinforcementAI extends AbstractAI {
         if(random.nextInt(100) < epsilon){
             //Explore a random action
             action = posfits.get(random.nextInt(posfits.size()));
-            
-            if(action == null){
-                System.out.println("Exploration action is null");
-            }
         } else {
-            float maxValue = -1000000f;
+            float maxValue = 0;
             
             for(BlockPosition a : posfits){
                 StateAction sa = new StateAction(state, a);
                 
                 float value = value(sa);
                 
-                if(value > maxValue){
+                if(value > maxValue || action == null){
                     maxValue = value;
                     action = a;
                 }
-            }
-            
-            if(action == null){
-                System.out.println("Best action is null, returning exploration");
-                action = posfits.get(random.nextInt(posfits.size()));
             }
         }
         
