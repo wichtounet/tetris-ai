@@ -11,6 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
@@ -74,7 +76,11 @@ public class TetrisPanel extends JPanel {
             @Override
             public void run() {
                 while (true) {
-                    sleep_(10);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        //Logger.getLogger(TetrisPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     repaint();
                 }
             }
