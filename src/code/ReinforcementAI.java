@@ -81,9 +81,9 @@ public class ReinforcementAI extends AbstractAI {
                 maxScore = score;
             }
             
-            System.out.println("Generation: " + iteration + " scored " + score);
-            System.out.println("Mean: " + (totalScores / (iteration + 1)));
-            System.out.println("Max: " + maxScore);
+            System.out.print(iteration + ";" + score);
+            System.out.print(";" + (totalScores / (iteration + 1)));
+            System.out.println(";" + maxScore);
         }
         
         //Pass to the next iteration
