@@ -32,8 +32,8 @@ public class ReinforcementAI extends AbstractAI {
     private static final float REWARD_SAME_LEVEL = 100;
     private static final float REWARD_MORE_LEVEL = -200;
     
-    //By default, an unknown state has the same value as an action that doesn't change the max level of the game
-    private static final float DEFAULT_VALUE = REWARD_SAME_LEVEL;
+    //By default, the value of unknown state is the max reward
+    private static final float DEFAULT_VALUE = 4 * REWARD_LESS_LEVEL;
     
     //Random number generator
     private static final Random random = new Random();
