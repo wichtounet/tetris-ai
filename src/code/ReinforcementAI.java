@@ -1,12 +1,9 @@
 package code;
 
-import static code.ProjectConstants.sleep_;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /*
  * This the reinforcement learning AbstractAI. 
@@ -16,33 +13,35 @@ import java.util.logging.Logger;
 public class ReinforcementAI extends AbstractAI {
     //General informations
     private static int iteration = -1;
-    private static int totalScores = 0;
+    private static long totalScores = 0;
     private static int maxScore = -1;
     
     //Percentage of time where the agent explores another way
-    private static final float epsilon = 0.01f;
+    private static final float epsilon = 0.05f;
     
     //Learning rate
-    private static final float alpha = 0.1f;
+    private static final float alpha = 0.2f;
     
     //Discount factor
-    private static final float lambda = 0.9f;
+    private static final float lambda = 0.8f;
     
     private static final int LEVELS = 3;//WARNING Memory usage is exponential to LEVELS
     
-    private static final float REWARD_LESS_LEVEL = 2.5f;
-    private static final float REWARD_SAME_LEVEL = 1.0f;
-    private static final float REWARD_MORE_LEVEL = -4.0f;
+    private static final float BASE_VALUE = 100;
     
-    private static final float REWARD_TOUCHING_EDGES = 0.3f;
-    private static final float REWARD_TOUCHING_WALLS = 0.7f;
-    private static final float REWARD_TOUCHING_FLOOR = 0.1f;
+    private static final float REWARD_LESS_LEVEL =      0.16f * BASE_VALUE;
+    private static final float REWARD_SAME_LEVEL =      0.0f * BASE_VALUE;
+    private static final float REWARD_MORE_LEVEL =      -0.4f * BASE_VALUE;
     
-    private static final float REWARD_HOLES = -0.1f;
-    private static final float REWARD_BLOCKADES = -0.1f;
+    private static final float REWARD_TOUCHING_EDGES =  0.4f * BASE_VALUE;
+    private static final float REWARD_TOUCHING_WALLS =  0.65f * BASE_VALUE;
+    private static final float REWARD_TOUCHING_FLOOR =  0.0065f * BASE_VALUE;
+    
+    private static final float REWARD_HOLES =           0.0f * BASE_VALUE;
+    private static final float REWARD_BLOCKADES =       0.0f * BASE_VALUE;
     
     //By default, the value of unknown state is the max reward
-    private static final float DEFAULT_VALUE = 4 * REWARD_LESS_LEVEL + 1.0f;
+    private static final float DEFAULT_VALUE = 4 * BASE_VALUE;
     
     //Random number generator
     private static final Random random = new Random();
@@ -143,24 +142,11 @@ public class ReinforcementAI extends AbstractAI {
         @Override
         public void run() {
             while (flag) {
-                try {
-                    //If it's merely paused, do nothing; if it's actually game over
-                    //then break loop entirely.
-                    if (engine.state == ProjectConstants.GameState.PLAYING) {
-                        if (engine.activeblock != null) {
-                            //System.out.println("doAction()");
-                            doAction(engine);
-                            //engine.step();
-                        }
-                    }
-                    
-                    //safety
-                    sleep_(waittime);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //System.out.print("Aborting and retrying...\n");
-                    //return;
-                }
+                //try {
+                    doAction(engine);
+                /*} catch (Exception e) {
+                    //e.printStackTrace();
+                }*/
             }
         }
     }
@@ -207,21 +193,23 @@ public class ReinforcementAI extends AbstractAI {
         //Warning: Top and Max level are not the same
         int maxLevel = getMaxLevel(ge.blocks);
         
+        //Apply the action on a copy of the world
         byte[][] mockGrid = mockGrid(ge);
-        
         applyAction(action, mockGrid);
         
         float reward = 0;
         
         //horizontal pairs
         for (int i = 0; i < ge.height; i++) {
+            if (mockGrid[0][i] == 2) {
+                reward += REWARD_TOUCHING_WALLS;
+            }
+            
+            if (mockGrid[ge.width - 1][i] == 2) {
+                reward += REWARD_TOUCHING_WALLS;
+            }
+            
             for (int j = 0; j < ge.width - 1; j++) {
-                if (j == 0 && mockGrid[j][i] == 2) {
-                    reward += REWARD_TOUCHING_WALLS;
-                }
-                if (j + 1 == ge.width - 1 && mockGrid[j + 1][i] == 2) {
-                    reward += REWARD_TOUCHING_WALLS;
-                }
                 if (mockGrid[j][i] + mockGrid[j + 1][i] >= 3) {
                     reward += REWARD_TOUCHING_EDGES;
                 }
@@ -230,10 +218,11 @@ public class ReinforcementAI extends AbstractAI {
 
         //vertical pairs
         for (int i = 0; i < ge.width; i++) {
+            if (mockGrid[i][ge.height - 1] == 2) {
+                reward += REWARD_TOUCHING_FLOOR;
+            }
+                
             for (int j = 0; j < ge.height - 1; j++) {
-                if (j + 1 == ge.height - 1 && mockGrid[i][j + 1] == 2) {
-                    reward += REWARD_TOUCHING_FLOOR;
-                }
                 if (mockGrid[i][j] + mockGrid[i][j + 1] >= 3) {
                     reward += REWARD_TOUCHING_EDGES;
                 }
@@ -244,30 +233,25 @@ public class ReinforcementAI extends AbstractAI {
         for (int i = 0; i < ge.width; i++) {
             // Part 1: Count how many holes (space beneath blocks)
             boolean f = false;
-            int holes = 0;
             for (int j = 0; j < ge.height; j++) {
                 if (mockGrid[i][j] > 0) {
                     f = true;
                 }
                 if (f && mockGrid[i][j] == 0) {
-                    holes++;
+                    reward += REWARD_HOLES;
                 }
             }
 
             // Part 2: Count how many blockades (block above space)
             f = false;
-            int blockades = 0;
             for (int j = ge.height - 1; j >= 0; j--) {
                 if (mockGrid[i][j] == 0) {
                     f = true;
                 }
                 if (f && mockGrid[i][j] > 0) {
-                    blockades++;
+                    reward += REWARD_BLOCKADES;
                 }
             }
-
-            reward += holes * REWARD_HOLES;
-            reward += blockades * REWARD_BLOCKADES;
         }
         
         //Do the action
