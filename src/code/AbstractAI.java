@@ -46,6 +46,20 @@ public abstract class AbstractAI {
     }
     
     protected abstract BlockPosition computeBestFit(TetrisEngine engine);
+
+    public byte[][] mockGrid(TetrisEngine ge) {
+        byte[][] mockgrid = new byte[ge.width][ge.height];
+        for (int i = 0; i < ge.width; i++) {
+            for (int j = 0; j < ge.height; j++) {
+                byte s = (byte) ge.blocks[i][j].getState();
+                if (s == 2) {
+                    s = 0;
+                }
+                mockgrid[i][j] = s;
+            }
+        }
+        return mockgrid;
+    }
     
     class AIThread extends Thread {
         @Override

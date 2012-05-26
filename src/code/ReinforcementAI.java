@@ -5,6 +5,8 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * This the reinforcement learning AbstractAI. 
@@ -32,8 +34,15 @@ public class ReinforcementAI extends AbstractAI {
     private static final float REWARD_SAME_LEVEL = 1.0f;
     private static final float REWARD_MORE_LEVEL = -4.0f;
     
+    private static final float REWARD_TOUCHING_EDGES = 0.3f;
+    private static final float REWARD_TOUCHING_WALLS = 0.7f;
+    private static final float REWARD_TOUCHING_FLOOR = 0.1f;
+    
+    private static final float REWARD_HOLES = -0.1f;
+    private static final float REWARD_BLOCKADES = -0.1f;
+    
     //By default, the value of unknown state is the max reward
-    private static final float DEFAULT_VALUE = 4 * REWARD_LESS_LEVEL;
+    private static final float DEFAULT_VALUE = 4 * REWARD_LESS_LEVEL + 1.0f;
     
     //Random number generator
     private static final Random random = new Random();
@@ -44,6 +53,84 @@ public class ReinforcementAI extends AbstractAI {
         super(panel);
         
         setThread(new AIThread());
+    }
+
+    private void applyAction(BlockPosition action, byte[][] mockGrid) {
+        byte[][] definition = TetrisEngine.blockdef[engine.activeblock.type][action.rot];
+
+        int h;
+        for (h = engine.height - 1;; h--) {
+
+            // indicator. 1: fits. 0: doesn't fit. -1: game over.
+            int fit_state = 1;
+
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (definition[j][i] >= 1) {
+                        if (h + j >= engine.height) {
+                            fit_state = 0;
+                        } else if (h + j < 0) {
+                            fit_state = -1;
+                        } else {
+                            if (mockGrid[i + action.bx][h + j] >= 1) {
+                                fit_state = 0;
+                            }
+
+                            if (fit_state == 1) {
+                                for (int h1 = h + j - 1; h1 >= 0; h1--) {
+                                    if (mockGrid[i + action.bx][h1] >= 1) {
+                                        fit_state = 0;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //We don't want game over so here:
+            if (fit_state == -1) {
+                return;
+            }
+
+            //1 = found!
+            if (fit_state == 1) {
+                break;
+            }
+        }
+
+        // copy over block position
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (definition[j][i] == 1) {
+                    mockGrid[action.bx + i][h + j] = 2;
+                }
+            }
+        }
+
+        // check for clears
+        boolean foundline;
+        do {
+            foundline = false;
+            ML:
+            for (int i = mockGrid[0].length - 1; i >= 0; i--) {
+                for (int y = 0; y < mockGrid.length; y++) {
+                    if (!(mockGrid[y][i] > 0)) {
+                        continue ML;
+                    }
+                }
+
+                // line i is full, clear it and copy
+                foundline = true;
+                for (int a = i; a > 0; a--) {
+                    for (int y = 0; y < mockGrid.length; y++) {
+                        mockGrid[y][a] = mockGrid[y][a - 1];
+                    }
+                }
+                break ML;
+            }
+        } while (foundline);
     }
     
     class AIThread extends Thread {
@@ -98,7 +185,13 @@ public class ReinforcementAI extends AbstractAI {
         return null;
     }
     
-    private void doAction(TetrisEngine ge) {      
+    private void doAction(TetrisEngine ge) {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ReinforcementAI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         //Compute the current state
         State state = computeState(ge.blocks);
         
@@ -108,10 +201,71 @@ public class ReinforcementAI extends AbstractAI {
         //Warning: Top and Max level are not the same
         int maxLevel = getMaxLevel(ge.blocks);
         
-        //Do the action
-        movehere(action.bx, action.rot);
+        byte[][] mockGrid = mockGrid(ge);
+        
+        applyAction(action, mockGrid);
         
         float reward = 0;
+        
+        //horizontal pairs
+        for (int i = 0; i < ge.height; i++) {
+            for (int j = 0; j < ge.width - 1; j++) {
+                if (j == 0 && mockGrid[j][i] == 2) {
+                    reward += REWARD_TOUCHING_WALLS;
+                }
+                if (j + 1 == ge.width - 1 && mockGrid[j + 1][i] == 2) {
+                    reward += REWARD_TOUCHING_WALLS;
+                }
+                if (mockGrid[j][i] + mockGrid[j + 1][i] >= 3) {
+                    reward += REWARD_TOUCHING_EDGES;
+                }
+            }
+        }
+
+        //vertical pairs
+        for (int i = 0; i < ge.width; i++) {
+            for (int j = 0; j < ge.height - 1; j++) {
+                if (j + 1 == ge.height - 1 && mockGrid[i][j + 1] == 2) {
+                    reward += REWARD_TOUCHING_FLOOR;
+                }
+                if (mockGrid[i][j] + mockGrid[i][j + 1] >= 3) {
+                    reward += REWARD_TOUCHING_EDGES;
+                }
+            }
+        }
+
+        //Penalize holes. Also penalize blocks above holes.
+        for (int i = 0; i < ge.width; i++) {
+            // Part 1: Count how many holes (space beneath blocks)
+            boolean f = false;
+            int holes = 0;
+            for (int j = 0; j < ge.height; j++) {
+                if (mockGrid[i][j] > 0) {
+                    f = true;
+                }
+                if (f && mockGrid[i][j] == 0) {
+                    holes++;
+                }
+            }
+
+            // Part 2: Count how many blockades (block above space)
+            f = false;
+            int blockades = 0;
+            for (int j = ge.height - 1; j >= 0; j--) {
+                if (mockGrid[i][j] == 0) {
+                    f = true;
+                }
+                if (f && mockGrid[i][j] > 0) {
+                    blockades++;
+                }
+            }
+
+            reward += holes * REWARD_HOLES;
+            reward += blockades * REWARD_BLOCKADES;
+        }
+        
+        //Do the action
+        movehere(action.bx, action.rot);
         
         //Reward difference in level
         int diffLevel = getMaxLevel(ge.blocks) - maxLevel;
@@ -122,10 +276,7 @@ public class ReinforcementAI extends AbstractAI {
         } else {
             reward += diffLevel * REWARD_MORE_LEVEL;
         }
-        
-        //TODO HOLES
-        //TODO EDGES
-        
+                
         //Compute the new state
         State nextState = computeState(ge.blocks);
         BlockPosition nextAction = getAction(ge, nextState);
