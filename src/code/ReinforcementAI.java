@@ -20,13 +20,13 @@ public class ReinforcementAI extends AbstractAI {
     private static int maxScore = -1;
     
     //Percentage of time where the agent explores another way
-    private static final int epsilon = 7;
+    private static final float epsilon = 0.01f;
     
     //Learning rate
-    private static final float alpha = 0.8f;
+    private static final float alpha = 0.1f;
     
     //Discount factor
-    private static final float lambda = 0.8f;
+    private static final float lambda = 0.9f;
     
     private static final int LEVELS = 3;//WARNING Memory usage is exponential to LEVELS
     
@@ -60,7 +60,6 @@ public class ReinforcementAI extends AbstractAI {
 
         int h;
         for (h = engine.height - 1;; h--) {
-
             // indicator. 1: fits. 0: doesn't fit. -1: game over.
             int fit_state = 1;
 
@@ -113,22 +112,29 @@ public class ReinforcementAI extends AbstractAI {
         boolean foundline;
         do {
             foundline = false;
-            ML:
-            for (int i = mockGrid[0].length - 1; i >= 0; i--) {
-                for (int y = 0; y < mockGrid.length; y++) {
-                    if (!(mockGrid[y][i] > 0)) {
-                        continue ML;
-                    }
-                }
-
-                // line i is full, clear it and copy
+            for (int line = 0; line < mockGrid[0].length; ++line) {
                 foundline = true;
-                for (int a = i; a > 0; a--) {
-                    for (int y = 0; y < mockGrid.length; y++) {
-                        mockGrid[y][a] = mockGrid[y][a - 1];
+                for (int row = 0; row < mockGrid.length; row++) {
+                    if (mockGrid[row][line] == 0) {
+                        foundline = false;
+                        break;
                     }
                 }
-                break ML;
+                
+                if(foundline){                    
+                    if(line == 0){
+                        for (int y = 0; y < mockGrid.length; y++) {
+                            mockGrid[y][line] = 0;
+                        }
+                    } else {
+                        // line line is full, clear it and copy
+                        for (int a = line; a < mockGrid[0].length; ++a) {
+                            for (int y = 0; y < mockGrid.length; y++) {
+                                mockGrid[y][a] = mockGrid[y][a - 1];
+                            }
+                        }
+                    }
+                }
             }
         } while (foundline);
     }
@@ -151,7 +157,7 @@ public class ReinforcementAI extends AbstractAI {
                     //safety
                     sleep_(waittime);
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    e.printStackTrace();
                     //System.out.print("Aborting and retrying...\n");
                     //return;
                 }
@@ -186,11 +192,11 @@ public class ReinforcementAI extends AbstractAI {
     }
     
     private void doAction(TetrisEngine ge) {
-        try {
+        /*try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
             Logger.getLogger(ReinforcementAI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
         
         //Compute the current state
         State state = computeState(ge.blocks);
@@ -344,7 +350,7 @@ public class ReinforcementAI extends AbstractAI {
         
         BlockPosition action = null;
         
-        if(random.nextInt(100) < epsilon){
+        if(random.nextDouble() <= epsilon){
             //Explore a random action
             action = posfits.get(random.nextInt(posfits.size()));
         } else {
