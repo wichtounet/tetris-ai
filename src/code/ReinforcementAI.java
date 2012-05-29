@@ -25,20 +25,20 @@ public class ReinforcementAI extends AbstractAI {
     //Discount factor
     private static final float lambda = 0.8f;
     
-    private static final int LEVELS = 3;//WARNING Memory usage is exponential to LEVELS
+    private static final int LEVELS = 4;//WARNING Memory usage is exponential to LEVELS
     
     private static final float BASE_VALUE = 100;
     
-    private static final float REWARD_LESS_LEVEL =      0.16f * BASE_VALUE;
-    private static final float REWARD_SAME_LEVEL =      0.0f * BASE_VALUE;
+    private static final float REWARD_LESS_LEVEL =      0.26f * BASE_VALUE;
+    private static final float REWARD_SAME_LEVEL =      0.15f * BASE_VALUE;
     private static final float REWARD_MORE_LEVEL =      -0.4f * BASE_VALUE;
     
     private static final float REWARD_TOUCHING_EDGES =  0.4f * BASE_VALUE;
     private static final float REWARD_TOUCHING_WALLS =  0.65f * BASE_VALUE;
     private static final float REWARD_TOUCHING_FLOOR =  0.0065f * BASE_VALUE;
     
-    private static final float REWARD_HOLES =           0.0f * BASE_VALUE;
-    private static final float REWARD_BLOCKADES =       0.0f * BASE_VALUE;
+    private static final float REWARD_HOLES =           -0.23f * BASE_VALUE;
+    private static final float REWARD_BLOCKADES =       -0.59f * BASE_VALUE;
     
     //By default, the value of unknown state is the max reward
     private static final float DEFAULT_VALUE = 4 * BASE_VALUE;
@@ -58,14 +58,14 @@ public class ReinforcementAI extends AbstractAI {
         byte[][] definition = TetrisEngine.blockdef[engine.activeblock.type][action.rot];
 
         int h;
-        for (h = engine.height - 1;; h--) {
+        for (h = engine.HEIGHT - 1;; h--) {
             // indicator. 1: fits. 0: doesn't fit. -1: game over.
             int fit_state = 1;
 
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
                     if (definition[j][i] >= 1) {
-                        if (h + j >= engine.height) {
+                        if (h + j >= engine.HEIGHT) {
                             fit_state = 0;
                         } else if (h + j < 0) {
                             fit_state = -1;
@@ -200,16 +200,16 @@ public class ReinforcementAI extends AbstractAI {
         float reward = 0;
         
         //horizontal pairs
-        for (int i = 0; i < ge.height; i++) {
+        for (int i = 0; i < TetrisEngine.HEIGHT; i++) {
             if (mockGrid[0][i] == 2) {
                 reward += REWARD_TOUCHING_WALLS;
             }
             
-            if (mockGrid[ge.width - 1][i] == 2) {
+            if (mockGrid[TetrisEngine.WIDTH - 1][i] == 2) {
                 reward += REWARD_TOUCHING_WALLS;
             }
             
-            for (int j = 0; j < ge.width - 1; j++) {
+            for (int j = 0; j < TetrisEngine.WIDTH - 1; j++) {
                 if (mockGrid[j][i] + mockGrid[j + 1][i] >= 3) {
                     reward += REWARD_TOUCHING_EDGES;
                 }
@@ -217,12 +217,12 @@ public class ReinforcementAI extends AbstractAI {
         }
 
         //vertical pairs
-        for (int i = 0; i < ge.width; i++) {
-            if (mockGrid[i][ge.height - 1] == 2) {
+        for (int i = 0; i < ge.WIDTH; i++) {
+            if (mockGrid[i][ge.HEIGHT - 1] == 2) {
                 reward += REWARD_TOUCHING_FLOOR;
             }
                 
-            for (int j = 0; j < ge.height - 1; j++) {
+            for (int j = 0; j < ge.HEIGHT - 1; j++) {
                 if (mockGrid[i][j] + mockGrid[i][j + 1] >= 3) {
                     reward += REWARD_TOUCHING_EDGES;
                 }
@@ -230,10 +230,10 @@ public class ReinforcementAI extends AbstractAI {
         }
 
         //Penalize holes. Also penalize blocks above holes.
-        for (int i = 0; i < ge.width; i++) {
+        for (int i = 0; i < ge.WIDTH; i++) {
             // Part 1: Count how many holes (space beneath blocks)
             boolean f = false;
-            for (int j = 0; j < ge.height; j++) {
+            for (int j = 0; j < ge.HEIGHT; j++) {
                 if (mockGrid[i][j] > 0) {
                     f = true;
                 }
@@ -244,7 +244,7 @@ public class ReinforcementAI extends AbstractAI {
 
             // Part 2: Count how many blockades (block above space)
             f = false;
-            for (int j = ge.height - 1; j >= 0; j--) {
+            for (int j = ge.HEIGHT - 1; j >= 0; j--) {
                 if (mockGrid[i][j] == 0) {
                     f = true;
                 }

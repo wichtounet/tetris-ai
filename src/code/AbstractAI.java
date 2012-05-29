@@ -48,9 +48,9 @@ public abstract class AbstractAI {
     protected abstract BlockPosition computeBestFit(TetrisEngine engine);
 
     public byte[][] mockGrid(TetrisEngine ge) {
-        byte[][] mockgrid = new byte[ge.width][ge.height];
-        for (int i = 0; i < ge.width; i++) {
-            for (int j = 0; j < ge.height; j++) {
+        byte[][] mockgrid = new byte[TetrisEngine.WIDTH][TetrisEngine.HEIGHT];
+        for (int i = 0; i < TetrisEngine.WIDTH; i++) {
+            for (int j = 0; j < TetrisEngine.HEIGHT; j++) {
                 byte s = (byte) ge.blocks[i][j].getState();
                 if (s == 2) {
                     s = 0;
@@ -197,7 +197,7 @@ public abstract class AbstractAI {
             int freeL = free / 10;
             int freeR = free % 10;
             int minX = 0 - freeL;
-            int maxX = (ge.width - 4) + freeR;
+            int maxX = (TetrisEngine.WIDTH - 4) + freeR;
             // now loop through each position for a rotation.
             for (int j = minX; j <= maxX; j++) {
                 BlockPosition put = new BlockPosition();

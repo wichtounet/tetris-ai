@@ -168,15 +168,15 @@ public class TetrisEngine {
      * Size of Tetris window, in pixels.
      */
     public Dimension bounds;
+    
+    public static final int WIDTH = 6;
+    public static final int HEIGHT = 16;
+    
     /*
-     * Width and height of the grid, counted in number of blocks.
+     * Dimensions (Width and HEIGHT) of each square. Squares in Tetris must be
+     * the same HEIGHT and WIDTH.
      */
-    public int width = 8, height = 16;
-    /*
-     * Dimensions (Width and height) of each square. Squares in Tetris must be
-     * the same height and width.
-     */
-    public int squaredim = 300 / width;
+    public int squaredim = 300 / WIDTH;
     /*
      * Dimensions of the squares of the next block as drawn. See squaredim.
      */
@@ -232,11 +232,11 @@ public class TetrisEngine {
      */
     public TetrisEngine(TetrisPanel p) {
         //Bounds changed to be thus:
-        bounds = new Dimension(squaredim * width, squaredim * height);
+        bounds = new Dimension(squaredim * WIDTH, squaredim * HEIGHT);
 
         //Initialize a DBlock array and set all its contents
         // to DBlock.EMPTY.
-        blocks = new Block[width][height];
+        blocks = new Block[WIDTH][HEIGHT];
         for (int t1 = 0; t1 < blocks.length; t1++) {
             for (int t2 = 0; t2 < blocks[t1].length; t2++) {
                 blocks[t1][t2] = new Block(Block.EMPTY);
@@ -761,7 +761,7 @@ public class TetrisEngine {
 
         ret.array = toBlock2D(blockdef[rnd1][rnd2]);
 
-        ret.x = width / 2 - 2;
+        ret.x = WIDTH / 2 - 2;
         ret.y = 0;
 
         Color bcolor = Block.colors[rnd1];
