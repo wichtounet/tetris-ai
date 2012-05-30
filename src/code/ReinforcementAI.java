@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 /*
- * This the reinforcement learning AbstractAI. 
- * 
- * TODO: Nothing is done so far, only a random player
+ * Reinforcement learning AI 
  */
 public class ReinforcementAI extends AbstractAI {
     //General informations

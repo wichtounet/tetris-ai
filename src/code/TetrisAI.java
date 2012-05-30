@@ -94,8 +94,6 @@ public class TetrisAI extends AbstractAI {
                 for (int i = 0; i < 4; i++) {
                     for (int j = 0; j < 4; j++) {
                         //check for bounds.
-
-
                         boolean block_p = bl[j][i] >= 1;
 
                         //we have to simulate lazy evaluation in order to avoid
