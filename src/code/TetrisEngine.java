@@ -170,7 +170,7 @@ public class TetrisEngine {
     public Dimension bounds;
     
     public static final int WIDTH = 6;
-    public static final int HEIGHT = 16;
+    public static final int HEIGHT = 20;
     
     /*
      * Dimensions (Width and HEIGHT) of each square. Squares in Tetris must be

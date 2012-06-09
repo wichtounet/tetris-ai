@@ -13,8 +13,14 @@ import java.util.Random;
 public class ReinforcementAI extends AbstractAI {
     //General informations
     private static int iteration = -1;
+    
     private static long totalScores = 0;
+    private static long memoryTotalScores = 0;
+    
     private static int maxScore = -1;
+    private static int memoryMaxScore = -1;
+    
+    private static int memory = 1000;
     
     //Percentage of time where the agent explores another way
     private static final float epsilon = 0.05f;
@@ -25,7 +31,7 @@ public class ReinforcementAI extends AbstractAI {
     //Discount factor
     private static final float lambda = 0.8f;
     
-    private static final int LEVELS = 4;//WARNING Memory usage is exponential to LEVELS
+    private static final int LEVELS = 2;//WARNING Memory usage is exponential to LEVELS
     
     private static final float BASE_VALUE = 100;
     
@@ -58,14 +64,14 @@ public class ReinforcementAI extends AbstractAI {
         byte[][] definition = TetrisEngine.blockdef[engine.activeblock.type][action.rot];
 
         int h;
-        for (h = engine.HEIGHT - 1;; h--) {
+        for (h = TetrisEngine.HEIGHT - 1;; h--) {
             // indicator. 1: fits. 0: doesn't fit. -1: game over.
             int fit_state = 1;
 
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
                     if (definition[j][i] >= 1) {
-                        if (h + j >= engine.HEIGHT) {
+                        if (h + j >= TetrisEngine.HEIGHT) {
                             fit_state = 0;
                         } else if (h + j < 0) {
                             fit_state = -1;
@@ -155,14 +161,21 @@ public class ReinforcementAI extends AbstractAI {
     public void send_ready(int score) {
         if(iteration > -1){
             totalScores += score;
+            memoryTotalScores += score;
             
-            if(score > maxScore){
-                maxScore = score;
+            maxScore = Math.max(maxScore, score);
+            memoryMaxScore = Math.max(memoryMaxScore, score);
+                        
+            if(iteration % memory == 0){
+                System.out.print(iteration);
+                System.out.print(";" + (totalScores / (iteration + 1)));
+                System.out.print(";" + maxScore);
+                System.out.print(";" + (memoryTotalScores / memory));
+                System.out.println(";" + memoryMaxScore);
+                
+                memoryTotalScores = 0;
+                memoryMaxScore = -1;
             }
-            
-            System.out.print(iteration + ";" + score);
-            System.out.print(";" + (totalScores / (iteration + 1)));
-            System.out.println(";" + maxScore);
         }
         
         //Pass to the next iteration
@@ -360,7 +373,7 @@ public class ReinforcementAI extends AbstractAI {
             Q.put(sa, DEFAULT_VALUE);
             
             if(Q.size() % 1000 == 0){
-                System.out.println("Grow to " + Q.size());
+                //System.out.println("Grow to " + Q.size());
             }
             
             return DEFAULT_VALUE;
