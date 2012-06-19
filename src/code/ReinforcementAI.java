@@ -24,28 +24,28 @@ public class ReinforcementAI extends AbstractAI {
     private static final float epsilon = 0.05f;
     
     //Learning rate
-    private static final float alpha = 0.2f;
+    private static final float alpha = 0.01f;
     
     //Discount factor
-    private static final float lambda = 0.8f;
+    private static final float lambda = 0.85f;
     
-    private static final int LEVELS = 2;//WARNING Memory usage is exponential to LEVELS
+    private static final int LEVELS = 3;//WARNING Memory usage is exponential to LEVELS
     
     private static final float BASE_VALUE = 100;
     
-    private static final float REWARD_LESS_LEVEL =      0.26f * BASE_VALUE;
-    private static final float REWARD_SAME_LEVEL =      0.15f * BASE_VALUE;
-    private static final float REWARD_MORE_LEVEL =      -0.4f * BASE_VALUE;
+    private static final float REWARD_LESS_LEVEL =      0.0f * BASE_VALUE;
+    private static final float REWARD_SAME_LEVEL =      0.0f * BASE_VALUE;
+    private static final float REWARD_MORE_LEVEL =      -1f * BASE_VALUE;
     
-    private static final float REWARD_TOUCHING_EDGES =  0.4f * BASE_VALUE;
-    private static final float REWARD_TOUCHING_WALLS =  0.65f * BASE_VALUE;
-    private static final float REWARD_TOUCHING_FLOOR =  0.0065f * BASE_VALUE;
+    private static final float REWARD_TOUCHING_EDGES =  0.0f * BASE_VALUE;
+    private static final float REWARD_TOUCHING_WALLS =  0.0f * BASE_VALUE;
+    private static final float REWARD_TOUCHING_FLOOR =  0.0f * BASE_VALUE;
     
-    private static final float REWARD_HOLES =           -0.23f * BASE_VALUE;
-    private static final float REWARD_BLOCKADES =       -0.59f * BASE_VALUE;
+    private static final float REWARD_HOLES =           -0.0f * BASE_VALUE;
+    private static final float REWARD_BLOCKADES =       -0.0f * BASE_VALUE;
     
     //By default, the value of unknown state is the max reward
-    private static final float DEFAULT_VALUE = 4 * BASE_VALUE;
+    private static final float DEFAULT_VALUE = 0;
     
     //Random number generator
     private static final Random random = new Random();
