@@ -31,18 +31,18 @@ public class ReinforcementAI extends AbstractAI {
     
     private static final int LEVELS = 3;//WARNING Memory usage is exponential to LEVELS
     
-    private static final float BASE_VALUE = 100;
+    private static final float BASE_VALUE = 100000;
     
     private static final float REWARD_LESS_LEVEL =      0.0f * BASE_VALUE;
     private static final float REWARD_SAME_LEVEL =      0.0f * BASE_VALUE;
-    private static final float REWARD_MORE_LEVEL =      -1f * BASE_VALUE;
+    private static final float REWARD_MORE_LEVEL =      -2.f * BASE_VALUE;
     
-    private static final float REWARD_TOUCHING_EDGES =  0.0f * BASE_VALUE;
-    private static final float REWARD_TOUCHING_WALLS =  0.0f * BASE_VALUE;
-    private static final float REWARD_TOUCHING_FLOOR =  0.0f * BASE_VALUE;
+    private static final float REWARD_TOUCHING_EDGES =  0.1f * BASE_VALUE;
+    private static final float REWARD_TOUCHING_WALLS =  0.2f * BASE_VALUE;
+    private static final float REWARD_TOUCHING_FLOOR =  0.05f * BASE_VALUE;
     
-    private static final float REWARD_HOLES =           -0.0f * BASE_VALUE;
-    private static final float REWARD_BLOCKADES =       -0.0f * BASE_VALUE;
+    private static final float REWARD_HOLES =           0.0f * BASE_VALUE;
+    private static final float REWARD_BLOCKADES =       0.0f * BASE_VALUE;
     
     //By default, the value of unknown state is the max reward
     private static final float DEFAULT_VALUE = 0;
